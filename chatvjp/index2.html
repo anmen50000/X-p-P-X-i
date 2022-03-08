@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elemon mai dinh</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="messdiv"></div>
+    <form id="send" style="margin-top: 40%; width: 80%;">
+        <input type="text" id="messinput" style="background-color: aqua;width: 80%;margin-left: 20%;">
+        <button type="submit" id="send-button" style="background-color: rgb(22, 20, 20);text-shadow: 1px 1px; color: azure; width: auto; margin-left: 55%;">nhập trại</button>
+
+    </form>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="blockchain.js"></script>
+<script>
+    const blockchain = require('blockchain')
+    var socket = io()
+    const messdiv = document.getElementById('messdiv')
+    const messagefrom = document.getElementById('send')
+    const messinput = document.getElementById('messinput')
+     const name = prompt('input ur name')
+    socket.emit('newuser', name)
+    sendmess('joined')
+    socket.on('user-connected', name =>{
+        sendmess(`${name} connected`)
+    })
+    socket.on('chatmessdata', data =>{
+        sendmess(`${data.name}: ${data.message}`)
+    })
+messagefrom.addEventListener('submit',e=>{
+    e.preventDefault();
+    const message = messinput.value
+    const login = await blockchain.getUser(message);
+    sendmess(message) 
+    messinput.value = ''
+})
+function sendmess(message){
+    const messElement = document.createElement('div')
+    const login = await blockchain.getUser(message);
+    messElement.innerText = login
+    messdiv.append(messElement)
+}
+
+</script>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>appchatvjppro</title>
+    <link rel="stylesheet" href="style.css">
+    <div id="messdiv" style="overflow: hidden;overflow-y: scroll; height: 200px;"></div>
+</head>
+<body > 
+    
+    <form id="send" style="margin-top: 5%; width: 80%; min-height: 100px;">
+        <input type="text" id="messinput" style="background-color: aqua;width: 80%;margin-left: 20%;">
+        <button type="submit" id="send-button" style="background-color: rgb(22, 20, 20);text-shadow: 1px 1px; color: azure; width: auto; margin-left: 55%;">Send</button>
+
+    </form>
+</body>
+<script src="/socket.io/socket.io.js"></script>
+<script src="./blockchain.js"></script>
+<script>
+
+    var socket = io()
+    const messdiv = document.getElementById('messdiv')
+    const messagefrom = document.getElementById('send')
+    const messinput = document.getElementById('messinput')
+     const name = prompt('input ur name')
+    socket.emit('newuser', name)
+    sendmess('joined')
+    socket.on('user-connected', name =>{
+        sendmess(`${name} connected`)
+    })
+    socket.on('chatmessdata', data =>{
+        sendmess(`${data.name}: ${data.message}`)
+    })
+messagefrom.addEventListener('submit',e=>{
+    e.preventDefault();
+    const message = messinput.value
+    socket.emit('sendchat',message)
+   
+    sendmess(`you:${message}`)
+    messinput.value = ''
+    var objDiv = document.getElementById("messdiv")
+    objDiv.scrollTop = objDiv.scrollHeight;
+})
+function sendmess(message){
+    const messElement = document.createElement('div')
+    messElement.innerText = message
+    messdiv.append(messElement)
+}
+</script>
+</html>
